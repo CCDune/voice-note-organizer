@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Voice Note Organizer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  <div class="row justify-content-center mt-3">
+    <div class="col-md-3 offset-md-1">
+
+      <div class="card">
+        <div class="card-body">
+          <form action="/generate-voice" method="POST">
+            <h5 class="card-title">AI Voice Generator</h5>
+            <label for="text">Enter text to speak:</label><br>
+              <textarea name="text" rows="5" cols="40"></textarea><br><br>
+              <button type="submit" class="btn btn-primary">Generate Voice</button>
+          </form>
+
+          {% if audio_file %}
+          <h2>Result:</h2>
+          <audio controls>
+            <source src="{{ url_for('static', filename=audio_file) }}" type="audio/mpeg">
+            Your browser does not support the audio element.
+          </audio>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

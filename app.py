@@ -1,32 +1,29 @@
-from flask import Flask, request, jsonify
-import requests
-import os
+from flask import Flask, request, jsonify, render_template, redirect, url_for
+import requests, os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 
-# ElevenLabs API key (for now, hardcoded — we'll protect later)
-ELEVENLABS_API_KEY = "sk_56265d1be67a0367a61d1c6ba47359cdd4170a904da54dff"
-VOICE_ID = "21m00Tcm4TlvDq8ikWAM"  # We'll pick a voice shortly!
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_ID = os.getenv("VOICE_ID")
 
-@app.route('/')
-def home():
-    return "Welcome to the Voice Note Organizer API!"
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html')
 
 @app.route('/generate-voice', methods=['POST'])
 def generate_voice():
-    data = request.get_json()
-    text = data.get('text')
+    text = request.form.get('text')
     if not text:
-        return jsonify({"error": "No text provided"}), 400
+        return redirect(url_for('index'))
 
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
-
     headers = {
         "Accept": "audio/mpeg",
         "Content-Type": "application/json",
         "xi-api-key": ELEVENLABS_API_KEY
     }
-
     payload = {
         "text": text,
         "voice_settings": {
@@ -39,9 +36,10 @@ def generate_voice():
 
     if response.status_code == 200:
         filename = "generated_voice.mp3"
-        with open(filename, "wb") as f:
+        filepath = os.path.join("static", filename)
+        with open(filepath, "wb") as f:
             f.write(response.content)
-        return jsonify({"message": "Voice generated", "file": filename}), 200
+        return render_template("index.html", audio_file=filename)
     else:
         return jsonify({"error": response.text}), response.status_code
 
